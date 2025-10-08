@@ -29,7 +29,11 @@ API endpoints:
 - /api/events/
 - /api/auth/token/ (obtain token)
 - /api/auth/register/ (register new user)
-
+btw .env example :
+"SECRET_KEY=''",
+"DEBUG=True",
+"GOOGLE_CLIENT_ID=''",
+"GOOGLE_CLIENT_SECRET=''"
 # ---
 # Recent Edits and Their Use (as of 2025-09-26)
 
