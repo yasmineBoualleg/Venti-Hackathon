@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clubs List</title>
+    <link rel="stylesheet" href="{% static 'css/white-theme.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Clubs</h1>
+            {% if user.is_authenticated %}
+            <button class="btn btn-primary" onclick=location.href="{% url club-create-request%}">Request New Club</button>
+            {% endif %}
+        </div>
+
+        <div id="clubs-list" class="grid">
+            <!-- Clubs will be loaded here -->
+        </div>
+    </div>
+
+    <script src="{% static 'js/api_helpers.js' %}" type="module"></script>
+    <script src="{% static 'js/toasts.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const clubs = await api.get('/api/clubs/');
+                const clubsList = document.getElementById('clubs-list');
+                
+                clubs.forEach(club => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <h3>${club.name}</h3>
+                        <p>${club.description}</p>
+                        <div class="actions">
+                            <button class="btn btn-primary" onclick="location.href='/clubs/${club.id}/dashboard'">
+                                View
+                            </button>
+                            ${!club.is_member ? `
+                                <button class="btn" onclick="joinClub(${club.id})">
+                                    ${club.requires_request ? 'Request to Join' : 'Join'}
+                                </button>
+                            ` : ''}
+                            ${club.is_admin ? `
+                                <button class="btn" onclick="location.href='/clubs/${club.id}/manage'">
+                                    Manage
+                                </button>
+                            ` : ''}
+                        </div>
+                    `;
+                    clubsList.appendChild(card);
+                });
+            } catch (error) {
+                toasts.error('Failed to load clubs');
+            }
+        });
+
+        async function joinClub(clubId) {
+            try {
+                await api.post(`/api/clubs/${clubId}/join/`);
+                toasts.success('Successfully joined/requested to join the club');
+                location.reload();
+            } catch (error) {
+                toasts.error('Failed to join club');
+            }
+        }
+    </script>
+</body>
+</html>

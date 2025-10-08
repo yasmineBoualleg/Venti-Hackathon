@@ -1,0 +1,181 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/white-theme.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="club-dashboard">
+            <!-- Left Column: Club Info -->
+            <div class="card">
+                <h2>{{ club.name }}</h2>
+                <p>{{ club.description }}</p>
+                <div class="club-meta">
+                    <p><strong>Created:</strong> {{ club.created_at|date }}</p>
+                    <p><strong>Admin:</strong> {{ club.admin.username }}</p>
+                    <p><strong>Members:</strong> {{ club.member_count }}</p>
+                </div>
+            </div>
+
+            <!-- Middle Column: Tabs -->
+            <div class="card">
+                <div class="tabs">
+                    <button class="tab active" data-tab="overview">Overview</button>
+                    <button class="tab" data-tab="members">Members</button>
+                    {% if is_admin or is_superuser %}
+                    <button class="tab" data-tab="requests">Requests</button>
+                    {% endif %}
+                    <button class="tab" data-tab="events">Events</button>
+                </div>
+
+                <div id="overview" class="tab-content active">
+                    <!-- Club overview content -->
+                </div>
+
+                <div id="members" class="tab-content">
+                    <!-- Members list will be loaded here -->
+                </div>
+
+                <div id="requests" class="tab-content">
+                    <!-- Join requests will be loaded here -->
+                </div>
+
+                <div id="events" class="tab-content">
+                    <!-- Events will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Right Column: Chat -->
+            <div class="card">
+                <h3>Club Chat</h3>
+                <div id="chat-messages" style="height: 400px; overflow-y: auto;">
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="message-input" placeholder="Type a message...">
+                    <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/api_helpers.js' %}" type="module"></script>
+    <script src="{% static 'js/toasts.js' %}"></script>
+    <script>
+        const clubId = "{{ club.id }}";
+        const isAdmin = "{{ is_admin|lower }}";
+        const isSuperuser = "{{ is_superuser|lower }}";
+
+        // WebSocket setup
+        const chatSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/chat/' + clubId + '/'
+        );
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            appendMessage(data.message);
+        };
+
+        function appendMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = message;
+            document.querySelector('#chat-messages').appendChild(messageDiv);
+        }
+
+        function sendMessage() {
+            const messageInput = document.querySelector('#message-input');
+            const message = messageInput.value;
+            if (message) {
+                chatSocket.send(JSON.stringify({
+                    'message': message
+                }));
+                messageInput.value = '';
+            }
+        }
+
+        // Tab handling
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.querySelectorAll('.tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+                loadTabContent(tab.dataset.tab);
+            });
+        });
+
+        async function loadTabContent(tab) {
+            try {
+                switch(tab) {
+                    case 'members':
+                        const members = await api.get(`/api/clubs/${clubId}/members/`);
+                        displayMembers(members);
+                        break;
+                    case 'requests':
+                        if (isAdmin || isSuperuser) {
+                            const requests = await api.get(`/api/clubs/${clubId}/requests/`);
+                            displayRequests(requests);
+                        }
+                        break;
+                    case 'events':
+                        const events = await api.get(`/api/clubs/${clubId}/events/`);
+                        displayEvents(events);
+                        break;
+                }
+            } catch (error) {
+                toasts.error('Failed to load content');
+            }
+        }
+
+        function displayMembers(members) {
+            const container = document.getElementById('members');
+            container.innerHTML = members.map(member => `
+                <div class="member-card">
+                    <span>${member.username}</span>
+                    <span class="badge">${member.role}</span>
+                    ${isAdmin ? `
+                        <button class="btn" onclick="manageMember('${member.id}')">
+                            Manage
+                        </button>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function displayRequests(requests) {
+            const container = document.getElementById('requests');
+            container.innerHTML = requests.map(request => `
+                <div class="request-card">
+                    <span>${request.username}</span>
+                    <button class="btn btn-primary" onclick="handleRequest('${request.id}', true)">
+                        Approve
+                    </button>
+                    <button class="btn" onclick="handleRequest('${request.id}', false)">
+                        Reject
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        async function handleRequest(requestId, approve) {
+            try {
+                await api.post(`/api/clubs/${clubId}/requests/${requestId}/${approve ? 'approve' : 'reject'}/`);
+                toasts.success(`Request ${approve ? 'approved' : 'rejected'}`);
+                loadTabContent('requests');
+            } catch (error) {
+                toasts.error('Failed to process request');
+            }
+        }
+
+        // Load initial content
+        loadTabContent('overview');
+    </script>
+</body>
+</html>

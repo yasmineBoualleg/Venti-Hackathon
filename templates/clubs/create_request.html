@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Club Request</title>
+    <link rel="stylesheet" href="{% static 'css/white-theme.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="card" style="max-width: 600px; margin: 2rem auto;">
+            <h2>Request to Create a Club</h2>
+            <form id="create-club-form">
+                <div class="form-group">
+                    <label for="name">Club Name</label>
+                    <input type="text" id="name" name="name" required class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" required class="form-control" rows="4"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit Request</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="{% static 'js/api_helpers.js' %}" type="module"></script>
+    <script src="{% static 'js/toasts.js' %}"></script>
+    <script>
+        document.getElementById('create-club-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                name: form.name.value,
+                description: form.description.value
+            };
+
+            try {
+                const response = await api.post('/api/clubs/', data);
+                toasts.success('Club request submitted — pending approval');
+                setTimeout(() => {
+                    window.location.href = '/clubs/';
+                }, 2000);
+            } catch (error) {
+                toasts.error('Failed to submit club request');
+            }
+        });
+    </script>
+</body>
+</html>

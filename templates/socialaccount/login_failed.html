@@ -1,0 +1,6 @@
+<script>
+if (window.location.href.includes('accounts/google/login/callback') && document.body.innerText.includes('Third-Party Login Failure')) {
+    // Redirect to dashboard on login failure
+    window.location.href = '/students/dashboard/';
+}
+</script>
