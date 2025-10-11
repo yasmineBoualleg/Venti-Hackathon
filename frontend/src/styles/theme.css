@@ -1,0 +1,36 @@
+/* frontend/src/styles/theme.css */
+:root {
+  /* Colors */
+  --color-background: #0a0f1e;
+  --color-surface: rgba(255, 255, 255, 0.06);
+  --color-primary: #00d4aa;
+  --color-secondary: #764ba2;
+  --color-text-primary: #f5f7fb;
+  --color-text-secondary: #9fb3c8;
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-error: #ff8a8a;
+  --color-success: #00d4aa;
+
+  /* Fonts */
+  --font-family-base: "Inter", sans-serif;
+
+  /* Sizing & Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+
+  /* Borders */
+  --border-radius-sm: 8px;
+  --border-radius-md: 16px;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-secondary)
+  );
+  --gradient-primary-hover: linear-gradient(135deg, #1affc4, #8b61b9);
+}

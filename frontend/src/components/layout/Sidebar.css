@@ -1,0 +1,80 @@
+/* frontend/src/components/layout/Sidebar.css */
+.sidebar {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid var(--color-border);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+.venti-logo {
+  font-size: 24px;
+  font-weight: 800;
+}
+.ven-solid {
+  color: var(--color-text-primary);
+}
+.ti-stroke {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--color-text-primary);
+}
+.profile-section {
+  text-align: center;
+}
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin: 0 auto var(--spacing-md);
+  background: var(--gradient-primary);
+  display: grid;
+  place-items: center;
+  font-size: 32px;
+  font-weight: 700;
+}
+.profile-section h3 {
+  font-weight: 600;
+}
+.profile-section p {
+  color: var(--color-primary);
+  font-weight: 500;
+}
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: 12px var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.nav-item:hover {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+.nav-item.active {
+  background: var(--color-primary);
+  color: var(--color-background);
+  font-weight: 600;
+}
+.sidebar-footer {
+  margin-top: auto;
+}
+.btn-logout {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  height: 44px;
+}
+.btn-logout:hover {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}

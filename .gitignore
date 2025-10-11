@@ -1,4 +1,36 @@
+# Python environments
+venv/
+.venv/
+.ven/
+
+# Node environments
+node_modules/
+frontend/node_modules/
+
+# Logs and misc
 .env
 TODO
 DEVELOPMENT_LOG.md
 FRONTEND_LOG.md
+
+# Editor
+.vscode/
+# Ignore virtual environments everywhere
+venv/
+.venv/
+.ven/
+*/venv/
+*/.venv/
+*/.ven/
+
+# Ignore node_modules everywhere
+node_modules/
+*/node_modules/
+
+# Python cache
+__pycache__/
+*/__pycache__/
+
+# Common junk
+.DS_Store
+.vscode/

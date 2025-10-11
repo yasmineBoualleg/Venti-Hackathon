@@ -1,0 +1,26 @@
+/* frontend/src/components/dashboard/PostCard.css */
+.post-card {
+  margin-bottom: var(--spacing-md);
+}
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+.post-club {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+.post-time {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+.post-content {
+  margin-bottom: var(--spacing-md);
+}
+.post-author {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  text-align: right;
+}

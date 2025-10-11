@@ -1,0 +1,37 @@
+/* frontend/src/components/dashboard/EventCard.css */
+.event-card {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: var(--spacing-lg);
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+.event-date {
+  text-align: center;
+  background: var(--gradient-primary);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-md) var(--spacing-sm);
+  color: white;
+  font-weight: 700;
+}
+.date-day {
+  font-size: 28px;
+  line-height: 1;
+}
+.date-month {
+  font-size: 14px;
+  text-transform: uppercase;
+}
+.event-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+.event-club,
+.event-time {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}

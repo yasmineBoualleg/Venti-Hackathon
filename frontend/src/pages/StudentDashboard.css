@@ -1,0 +1,19 @@
+/* frontend/src/pages/StudentDashboard.css */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
+}
+.dashboard-section {
+  margin-top: var(--spacing-xxl);
+}
+.dashboard-section h3 {
+  margin-bottom: var(--spacing-md);
+  font-size: 20px;
+  font-weight: 600;
+}
+.empty-state {
+  color: var(--color-text-secondary);
+  padding: var(--spacing-lg);
+  text-align: center;
+}
