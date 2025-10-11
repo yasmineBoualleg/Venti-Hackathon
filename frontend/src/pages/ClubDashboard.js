@@ -117,12 +117,12 @@ const ClubDashboard = () => {
   }, [initialMessages]);
 
   useEffect(() => {
-    // WebSocket connection logic remains the same...
     if (!club || !user || !club.chat_websocket_url) return;
 
     const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+    const backendHost = new URL(apiClient.client.defaults.baseURL).host;
     const accessToken = localStorage.getItem("accessToken");
-    const socketUrl = `${wsScheme}://${window.location.host}${club.chat_websocket_url}?token=${accessToken}`;
+    const socketUrl = `${wsScheme}://${backendHost}${club.chat_websocket_url}?token=${accessToken}`;
 
     chatSocketRef.current = new WebSocket(socketUrl);
     chatSocketRef.current.onmessage = (e) => {

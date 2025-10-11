@@ -65,7 +65,7 @@
 }
 .nav-item.active {
   background: var(--color-primary);
-  color: var(--color-background);
+  color: white;
   font-weight: 600;
 }
 .nav-item.active .material-icons {

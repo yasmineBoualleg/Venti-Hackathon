@@ -48,6 +48,10 @@ const StudentDashboard = () => {
     );
   if (!dashboardData) return null;
 
+  const noActivity = 
+    dashboardData.upcoming_events.length === 0 && 
+    dashboardData.recent_posts.length === 0;
+
   return (
     <MainLayout>
       <div className="dashboard-grid">
@@ -66,6 +70,17 @@ const StudentDashboard = () => {
             />
             <StatCard label="XP Points" value={user.xp_points} icon="star" />
           </div>
+
+          {noActivity && (
+            <div className="empty-state card">
+              <span className="material-icons">explore</span>
+              <h3>Your dashboard is quiet...</h3>
+              <p>Join some clubs to see updates and events here.</p>
+              <Link to="/clubs" className="btn btn-primary">
+                Discover Clubs
+              </Link>
+            </div>
+          )}
 
           <div className="widgets-grid-main">
             <Widget color="purple" title="My Tasks">

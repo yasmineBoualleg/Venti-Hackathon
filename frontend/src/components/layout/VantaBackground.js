@@ -20,8 +20,6 @@ const VantaBackground = ({ children, isStatic = false }) => {
         minWidth: 200.0,
         scale: 1.0,
         scaleMobile: 1.0,
-        color: 0x00d4aa, // --color-primary
-        backgroundColor: 0x0a0f1e, // --color-background
         points: 12.0,
         maxDistance: 20.0,
         spacing: 18.0,

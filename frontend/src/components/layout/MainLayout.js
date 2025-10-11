@@ -5,12 +5,13 @@ import VantaBackground from "./VantaBackground"; // Import the new component
 
 const MainLayout = ({ children }) => {
   return (
-    <VantaBackground>
+    <>
+      <VantaBackground />
       <div className="page-layout">
         <Sidebar />
-        <main className="main-content">{children}</main>
+        <main className="main-content-area">{children}</main>
       </div>
-    </VantaBackground>
+    </>
   );
 };
 
