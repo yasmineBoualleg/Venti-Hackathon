@@ -53,7 +53,7 @@ a {
   top: 50%;
   transform: translate(-50%, -50%);
   opacity: 0.15;
-  background: url("../../static/images/earth.png") center/cover no-repeat;
+  background: url("../assets/images/earth.png") center/cover no-repeat;
   animation: slow-rotate 180s linear infinite;
 }
 

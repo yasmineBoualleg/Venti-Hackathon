@@ -55,7 +55,7 @@ body {
     top: 0;
     left: 0;
     opacity: 0.6;
-    background: url('../images/earth.png') center/cover no-repeat;
+    background: url('../assets/images/earth.png') center/cover no-repeat;
 }
 
 .orbit-container {

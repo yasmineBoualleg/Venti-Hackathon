@@ -12,6 +12,7 @@ import StudentDashboard from "./pages/StudentDashboard";
 import LandingPage from "./pages/LandingPage";
 import ClubsListing from "./pages/ClubsListing";
 import ClubDashboard from "./pages/ClubDashboard";
+import ClubEvents from "./pages/ClubEvents";
 import LoginPage from "./pages/LoginPage";
 import AuthCallbackPage from "./pages/AuthCallbackPage";
 
@@ -51,8 +52,17 @@ function AppRoutes() {
           </PrivateRoute>
         }
       />
+      <Route
+        path="/events"
+        element={
+          <PrivateRoute>
+            <ClubEvents />
+          </PrivateRoute>
+        }
+      />
 
       {/* Fallback route can go here */}
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 }

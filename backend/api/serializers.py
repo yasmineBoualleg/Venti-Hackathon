@@ -11,15 +11,17 @@ class UserSerializer(serializers.ModelSerializer):
 class ClubSerializer(serializers.ModelSerializer):
     admin_username = serializers.CharField(source='admin.username', read_only=True)
     members_count = serializers.IntegerField(source='members.count', read_only=True)
-    chat_websocket_url = serializers.SerializerMethodField()
+    is_member = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Club
-        fields = ['id', 'name', 'description', 'admin_username', 'members_count', 'chat_websocket_url']
+        fields = ['id', 'name', 'description', 'admin_username', 'members_count', 'is_member', 'is_active']
 
-    def get_chat_websocket_url(self, obj):
-        """Generate the WebSocket URL for this club's chat"""
-        return f"/ws/chat/{obj.id}/"
+    def get_is_member(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return obj.members.filter(id=user.id).exists()
+        return False
 
 
 class ClubMembershipSerializer(serializers.ModelSerializer):
@@ -65,9 +67,14 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
+    club_name = serializers.CharField(source='club.name', read_only=True)
+
     class Meta:
         model = models.Event
-        fields = ['id', 'club', 'title', 'description', 'date']
+        fields = ['id', 'club', 'club_name', 'title', 'description', 'date']
+        extra_kwargs = {
+            'club': {'write_only': True}
+        }
 
 class ClubMembershipSerializerForDashboard(serializers.ModelSerializer):
     club_name = serializers.CharField(source='club.name')

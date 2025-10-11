@@ -36,42 +36,53 @@ const StudentDashboard = () => {
 
   return (
     <MainLayout>
-      <div className="content-header">
-        <h2>Dashboard</h2>
-        <p>Welcome back, @{user.username}!</p>
-      </div>
-      <div className="stats-grid">
-        <StatCard
-          label="My Clubs"
-          value={dashboardData.clubs_count}
-          icon="group"
-        />
-        <StatCard label="XP Points" value={user.xp_points} icon="star" />
-      </div>
-      <section className="dashboard-section">
-        <h3>Upcoming Events</h3>
-        <div className="events-list">
-          {dashboardData.upcoming_events.length > 0 ? (
-            dashboardData.upcoming_events.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))
-          ) : (
-            <p className="empty-state">No upcoming events from your clubs.</p>
-          )}
+      <div className="dashboard-grid">
+        <div className="dashboard-main">
+          <div className="content-header">
+            <h2>Dashboard</h2>
+            <p className="subtitle">Welcome back, @{user.username}!</p>
+          </div>
+          <div className="stats-grid">
+            <StatCard
+              label="My Clubs"
+              value={dashboardData.clubs_count}
+              icon="group"
+            />
+            <StatCard label="XP Points" value={user.xp_points} icon="star" />
+          </div>
+          <section className="dashboard-section">
+            <h3>Upcoming Events</h3>
+            <div className="events-list">
+              {dashboardData.upcoming_events.length > 0 ? (
+                dashboardData.upcoming_events.map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))
+              ) : (
+                <div className="empty-state card">
+                  <span className="material-icons">event_busy</span>
+                  <p>No upcoming events from your clubs.</p>
+                </div>
+              )}
+            </div>
+          </section>
         </div>
-      </section>
-      <section className="dashboard-section">
-        <h3>Recent Club Posts</h3>
-        <div className="posts-list">
-          {dashboardData.recent_posts.length > 0 ? (
-            dashboardData.recent_posts.map((post) => (
-              <PostCard key={post.id} post={post} />
-            ))
-          ) : (
-            <p className="empty-state">No recent activity.</p>
-          )}
-        </div>
-      </section>
+
+        <aside className="feed-column">
+          <h3>Recent Activity</h3>
+          <div className="posts-list">
+            {dashboardData.recent_posts.length > 0 ? (
+              dashboardData.recent_posts.map((post) => (
+                <PostCard key={post.id} post={post} />
+              ))
+            ) : (
+              <div className="empty-state card">
+                <span className="material-icons">chat_bubble_outline</span>
+                <p>No recent activity in your clubs.</p>
+              </div>
+            )}
+          </div>
+        </aside>
+      </div>
     </MainLayout>
   );
 };

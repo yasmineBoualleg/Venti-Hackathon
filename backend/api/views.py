@@ -1,4 +1,3 @@
-
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -11,7 +10,7 @@ def get_jwt_for_social_auth(request):
         'access': str(refresh.access_token),
     })
 
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -20,12 +19,11 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 
-from . import models, serializers
+from . import models, serializers, services
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
-from rest_framework import permissions
 from django.db.models import F
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 
 def signup_view(request):
@@ -34,7 +32,7 @@ def signup_view(request):
         email = request.POST.get("email")
         password = request.POST.get("password")
 
-        user = User.objects.create_user(username=username, email=email, password=password)
+        user = models.User.objects.create_user(username=username, email=email, password=password)
         return redirect("dashboard")  # or wherever you want
 
     return render(request, "signup.html")
@@ -61,29 +59,17 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.User.objects.all()
     serializer_class = serializers.UserSerializer
 
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
-    def set_password(self, request, pk=None):
-        # allow change if requester is superuser OR shares a club membership with the target user OR is club admin/subadmin
-        target = self.get_object()
-        requester = request.user
-        new_password = request.data.get('password')
-        if not new_password:
-            return Response({'detail': 'password required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # superuser can always change
-        if requester.is_superuser:
-            target.set_password(new_password)
-            target.save()
-            return Response({'detail': 'password updated by superuser'})
-
-        # check shared club membership where requester is member/subadmin/admin
-        clubs_shared = models.Club.objects.filter(members=requester).filter(members=target)
-        if clubs_shared.exists():
-            target.set_password(new_password)
-            target.save()
-            return Response({'detail': 'password updated'})
-
-        return Response({'detail': 'forbidden'}, status=status.HTTP_403_FORBIDDEN)
+    @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def memberships(self, request, pk=None):
+        user = self.get_object()
+        # Ensure the requesting user can only see their own memberships unless they are a superuser
+        if request.user.is_superuser or request.user == user:
+            memberships = models.ClubMembership.objects.filter(user=user)
+            # We want to return the clubs, not the membership objects directly
+            clubs = [membership.club for membership in memberships]
+            serializer = serializers.ClubSerializer(clubs, many=True, context={'request': request})
+            return Response(serializer.data)
+        return Response({'detail': 'You do not have permission to view these memberships.'}, status=status.HTTP_403_FORBIDDEN)
 
 
 class IsClubAdminOrReadOnly(permissions.BasePermission):
@@ -132,171 +118,59 @@ class ClubViewSet(viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
         
         serializer = self.get_serializer(pending_clubs, many=True)
-        return Response({
-            'count': pending_clubs.count(),
-            'results': serializer.data
-        })
+        return Response(serializer.data)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def approve(self, request, pk=None):
         """Approve a pending club. Only superusers can do this."""
         club = self.get_object()
-        success, message = services.approve_club(club)
-        
-        if not success:
-            return Response({'detail': message}, status=status.HTTP_400_BAD_REQUEST)
-        
-        return Response({
-            'detail': message,
-            'club': serializers.ClubDetailSerializer(club).data
-        })
+        club.is_active = True
+        club.approved_date = timezone.now()
+        club.save()
+        send_mail(
+            f'Club "{club.name}" Approved',
+            'Your club has been approved.',
+            settings.DEFAULT_FROM_EMAIL,
+            [club.admin.email],
+            fail_silently=True
+        )
+        return Response({'detail': 'Club approved'})
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def reject(self, request, pk=None):
         """Reject a pending club. Only superusers can do this."""
         club = self.get_object()
-        reason = request.data.get('reason', '')
-        
-        success, message = services.reject_club(club, reason)
-        
-        if not success:
-            return Response({'detail': message}, status=status.HTTP_400_BAD_REQUEST)
-        
-        return Response({
-            'detail': message,
-            'club': serializers.ClubDetailSerializer(club).data
-        })
-
-    def get_permissions(self):
-        if self.action in ['join']:
-            return [permissions.IsAuthenticated()]
-        elif self.action in ['leave']:
-            return [permissions.IsAuthenticated(), IsClubMemberOrReadOnly()]
-        elif self.action in ['kick_member']:
-            return [permissions.IsAuthenticated(), IsClubAdminOrReadOnly()]
-        return super().get_permissions()
+        reason = request.data.get('reason', 'No reason provided.')
+        club.rejected_reason = reason
+        club.rejection_date = timezone.now()
+        club.is_active = False
+        club.save()
+        send_mail(
+            f'Club "{club.name}" Rejected',
+            f'Your club has been rejected. Reason: {reason}',
+            settings.DEFAULT_FROM_EMAIL,
+            [club.admin.email],
+            fail_silently=True
+        )
+        return Response({'detail': 'Club rejected'})
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def join(self, request, pk=None):
-        club = self.get_object()
+        club = get_object_or_404(models.Club, pk=pk)
+        if club.members.filter(id=request.user.id).exists():
+            return Response({'detail': 'Already a member'}, status=status.HTTP_400_BAD_REQUEST)
+        club.members.add(request.user)
         user = request.user
-        
-        success, message = services.join_club(club, user)
-        
-        if not success:
-            return Response({'detail': message}, status=status.HTTP_400_BAD_REQUEST)
-        
-        return Response({
-            'detail': message,
-            'club': club.name,
-            'xp_points': user.xp_points
-        })
-
-    @action(detail=True, methods=['post'])
-    def leave(self, request, pk=None):
-        club = self.get_object()
-        user = request.user
-        
-        success, message = services.leave_club(club, user)
-        
-        if not success:
-            return Response({'detail': message}, status=status.HTTP_400_BAD_REQUEST)
-        
-        return Response({
-            'detail': message,
-            'club': club.name
-        })
-
-    @action(detail=True, methods=['post'])
-    def kick_member(self, request, pk=None):
-        club = self.get_object()
-        username = request.data.get('username')
-        if not username:
-            return Response({'detail': 'Username required'}, status=status.HTTP_400_BAD_REQUEST)
-            
-        try:
-            user_to_kick = models.User.objects.get(username=username)
-        except models.User.DoesNotExist:
-            return Response({'detail': f"User '{username}' not found"}, status=status.HTTP_404_NOT_FOUND)
-            
-        success, message = services.kick_member(club, user_to_kick)
-        
-        if not success:
-            return Response({'detail': message}, status=status.HTTP_400_BAD_REQUEST)
-        
-        return Response({
-            'detail': message,
-            'club': club.name,
-            'kicked_user': username
-        })
-
-    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
-    def set_subadmin(self, request, pk=None):
-        # only club admin can set/remove subadmins
-        club = self.get_object()
-        requester = request.user
-        if club.admin != requester and not requester.is_superuser:
-            return Response({'detail': 'only club admin can set subadmins'}, status=status.HTTP_403_FORBIDDEN)
-        username = request.data.get('username')
-        is_subadmin = bool(request.data.get('is_subadmin', True))
-        try:
-            user = models.User.objects.get(username=username)
-        except models.User.DoesNotExist:
-            return Response({'detail': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
-            
-        membership = services.set_subadmin(club, user, is_subadmin)
-        
-        return Response({'detail': 'subadmin set', 'user': user.username, 'is_subadmin': membership.is_subadmin})
-
-    @action(detail=True, methods=['post', 'get'], permission_classes=[permissions.IsAdminUser])
-    def set_admin(self, request, pk=None):
-        """Set a new admin for the club. Only superusers can do this.
-        GET shows the form, POST processes it."""
-        club = self.get_object()
-        
-        if request.method == 'GET':
-            # Return a form-friendly response showing just the username field
-            return Response({
-                'instructions': 'Enter the username of the new club admin',
-                'current_admin': club.admin.username,
-                'method': 'POST',
-                'fields': {
-                    'new_admin_username': {
-                        'type': 'string',
-                        'required': True,
-                        'label': 'Set new admin to'
-                    }
-                }
-            })
-        
-        # Handle POST - process the admin change
-        new_admin_username = request.data.get('new_admin_username')
-        if not new_admin_username:
-            return Response(
-                {'detail': 'new_admin_username is required'}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-            
-        try:
-            new_admin = models.User.objects.get(username=new_admin_username)
-        except models.User.DoesNotExist:
-            return Response(
-                {'detail': f"User '{new_admin_username}' not found"}, 
-                status=status.HTTP_404_NOT_FOUND
-            )
-            
-        club = services.set_admin(club, new_admin)
-        
-        return Response({
-            'detail': 'Club admin changed successfully',
-            'club': club.name,
-            'new_admin': new_admin.username
-        })
+        user.xp_points = F('xp_points') + 5
+        user.save(update_fields=['xp_points'])
+        user.refresh_from_db()
+        return Response({'detail': 'joined', 'xp_points': user.xp_points})
 
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = models.Post.objects.all().order_by('-created_at')
     serializer_class = serializers.PostSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
         post = serializer.save(author=self.request.user)
@@ -310,33 +184,40 @@ class PostViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = models.Message.objects.all().order_by('created_at')
     serializer_class = serializers.MessageSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def get_permissions(self):
-        if self.action in ['create']:
-            return [IsAuthenticated()]
-        return super().get_permissions()
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        club_id = self.request.query_params.get('club')
+        if club_id:
+            queryset = queryset.filter(club_id=club_id)
+        return queryset
 
     def perform_create(self, serializer):
         msg = serializer.save(author=self.request.user)
         user = self.request.user
-        user.xp_points = F('xp_points') + 10
+        user.xp_points = F('xp_points') + 5
         user.save(update_fields=['xp_points'])
         user.refresh_from_db()
 
 
-class EventViewSet(viewsets.ReadOnlyModelViewSet):
+class EventViewSet(viewsets.ModelViewSet):
     queryset = models.Event.objects.all().order_by('date')
     serializer_class = serializers.EventSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
-        # only upcoming events
-        from django.utils import timezone
-
+        """Only show upcoming events."""
         now = timezone.now()
         return super().get_queryset().filter(date__gte=now).order_by('date')
 
+    def perform_create(self, serializer):
+        """Ensure the user is a member of the club they are creating an event for."""
+        club = serializer.validated_data.get('club')
+        if not club.members.filter(id=self.request.user.id).exists() and not self.request.user.is_superuser:
+            raise permissions.PermissionDenied("You must be a member of the club to create an event.")
+        serializer.save()
 
-from . import services
 
 class StudentDashboardAPIView(APIView):
     """

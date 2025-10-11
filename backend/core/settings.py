@@ -54,7 +54,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, '../frontend/templates')],
+        'DIRS': [os.path.join(BASE_DIR, '..', 'frontend', 'build')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -65,6 +65,11 @@ TEMPLATES = [
             ],
         },
     },
+]
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, '..', 'frontend', 'build', 'static'),
+    os.path.join(BASE_DIR, '..', 'frontend', 'build'), # Add this line
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'

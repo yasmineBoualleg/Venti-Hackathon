@@ -1,19 +1,88 @@
 /* frontend/src/pages/StudentDashboard.css */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: var(--spacing-xl);
+  height: calc(100vh - (var(--spacing-xl) * 2)); /* Full height minus padding */
+}
+
+.dashboard-main {
+  overflow-y: auto;
+  padding-right: var(--spacing-md);
+}
+
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--spacing-lg);
 }
+
 .dashboard-section {
   margin-top: var(--spacing-xxl);
 }
+
 .dashboard-section h3 {
   margin-bottom: var(--spacing-md);
   font-size: 20px;
   font-weight: 600;
 }
+
+.feed-column {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-lg);
+  overflow-y: auto;
+  height: 100%;
+}
+
+.feed-column h3 {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  font-weight: 600;
+}
+
+.posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
 .empty-state {
   color: var(--color-text-secondary);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-xxl) var(--spacing-lg);
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+.empty-state .material-icons {
+  font-size: 48px;
+  opacity: 0.5;
+}
+
+/* Scrollbar styling */
+.dashboard-main::-webkit-scrollbar,
+.feed-column::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dashboard-main::-webkit-scrollbar-track,
+.feed-column::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dashboard-main::-webkit-scrollbar-thumb,
+.feed-column::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  .feed-column {
+    display: none; /* Hide feed on smaller screens for simplicity */
+  }
 }

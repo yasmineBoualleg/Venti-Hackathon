@@ -1,0 +1,136 @@
+/* frontend/src/pages/ClubsListing.css */
+
+.clubs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.club-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.club-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.club-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--border-radius-sm);
+  background: var(--gradient-primary);
+  display: grid;
+  place-items: center;
+  color: white;
+}
+.club-logo .material-icons {
+  font-size: 28px;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-badge.joined {
+  background: rgba(0, 212, 170, 0.2);
+  color: var(--color-primary);
+}
+
+.status-badge.available {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-primary);
+}
+
+.club-content {
+  flex-grow: 1;
+}
+
+.club-name {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+}
+
+.club-description {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-md);
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+.club-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.club-actions .action-btn {
+  width: 100%;
+}
+
+/* Modal styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 500px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.modal-header h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+  margin-top: var(--spacing-lg);
+}
+
+.error-message {
+  color: var(--color-error);
+  font-size: 14px;
+  margin-top: var(--spacing-md);
+}
