@@ -55,19 +55,22 @@
 
 .info-tab p {
   margin-bottom: var(--spacing-sm);
+  line-height: 1.6;
 }
 
-.members-list {
+/* Members and Requests Lists */
+.members-list,
+.requests-list {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
 }
-.member-item {
+.member-item,
+.request-item {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  padding: var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-md);
 }
 .member-avatar {
   width: 40px;
@@ -77,10 +80,12 @@
   display: grid;
   place-items: center;
   font-weight: 600;
+  flex-shrink: 0;
 }
 .member-details {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
 }
 .member-name {
   font-weight: 500;
@@ -88,6 +93,25 @@
 .member-joined {
   font-size: 12px;
   color: var(--color-text-secondary);
+}
+.admin-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--color-primary);
+  color: var(--color-background);
+}
+.request-item {
+  justify-content: space-between;
+}
+.request-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+.request-actions .btn {
+  padding: 8px 16px;
+  height: auto;
 }
 
 .chat-messages {
@@ -122,6 +146,7 @@
 }
 .message-text {
   line-height: 1.5;
+  word-wrap: break-word;
 }
 .message-time {
   font-size: 10px;
@@ -149,8 +174,23 @@
   margin: 0;
 }
 
+.empty-state {
+  padding: var(--spacing-xl);
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+.empty-state .material-icons {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-md);
+}
+
 @media (max-width: 1024px) {
   .club-dashboard-grid {
     grid-template-columns: 1fr;
+    height: auto;
+  }
+  .club-chat-panel {
+    /* Make chat panel shorter on mobile */
+    min-height: 50vh;
   }
 }

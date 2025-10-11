@@ -9,7 +9,7 @@ import LoadingSpinner from "../components/common/LoadingSpinner";
 import ErrorDisplay from "../components/common/ErrorDisplay";
 import "./ClubsListing.css";
 
-const ClubCard = ({ club, onJoinClub, onGoToClub }) => {
+const ClubCard = ({ club, onJoinClub, onGoToClub, onManageClub }) => {
   return (
     <div className="club-card card">
       <div className="club-header">
@@ -60,8 +60,17 @@ const ClubCard = ({ club, onJoinClub, onGoToClub }) => {
             onClick={() => onJoinClub(club.id)}
           >
             <span className="material-icons">person_add</span>
-            Join Club
+            {club.requires_request ? 'Request to Join' : 'Join Club'}
           </button>
+        )}
+        {club.is_admin && (
+            <button
+                className="action-btn btn-tertiary"
+                onClick={() => onManageClub(club.id)}
+            >
+                <span className="material-icons">settings</span>
+                Manage
+            </button>
         )}
       </div>
     </div>
@@ -159,8 +168,8 @@ const ClubsListing = () => {
 
   const handleJoinClub = async (clubId) => {
     try {
-      await apiClient.joinClub(clubId);
-      alert("Successfully joined the club!");
+      const response = await apiClient.joinClub(clubId);
+      alert(response.data.detail);
       refetch();
     } catch (err) {
       alert(err.response?.data?.detail || "Failed to join club");
@@ -168,6 +177,10 @@ const ClubsListing = () => {
   };
 
   const handleGoToClub = (clubId) => {
+    navigate(`/clubs/${clubId}`);
+  };
+
+  const handleManageClub = (clubId) => {
     navigate(`/clubs/${clubId}`);
   };
 
@@ -225,6 +238,7 @@ const ClubsListing = () => {
                 club={club}
                 onJoinClub={handleJoinClub}
                 onGoToClub={handleGoToClub}
+                onManageClub={handleManageClub}
               />
             ))
           ) : (

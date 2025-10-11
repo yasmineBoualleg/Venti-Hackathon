@@ -16,16 +16,20 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const initializeAuth = useCallback(async () => {
-    const decodedToken = apiClient.getDecodedToken();
-    if (decodedToken) {
-      try {
-        // Fetch full user details using the user_id from the token
-        const { data } = await apiClient.getUser(decodedToken.user_id);
-        setUser(data);
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-        apiClient.logout();
-        setUser(null);
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      // Set the token in our api client header for the initial load
+      apiClient.setTokens(token, localStorage.getItem("refreshToken"));
+      const decodedToken = apiClient.getDecodedToken();
+      if (decodedToken) {
+        try {
+          const { data } = await apiClient.getUser(decodedToken.user_id);
+          setUser(data);
+        } catch (error) {
+          console.error("Failed to fetch user data on initial load:", error);
+          apiClient.logout();
+          setUser(null);
+        }
       }
     }
     setIsLoading(false);
@@ -37,7 +41,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     await apiClient.login(username, password);
-    await initializeAuth(); // Re-initialize to fetch user data with the new token
+    await initializeAuth();
   };
 
   const handleSocialAuth = useCallback(
@@ -55,11 +59,13 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    setUser, // Expose setUser for updates
     login,
     logout,
     isLoading,
     isAuthenticated: !!user,
     handleSocialAuth,
+    initializeAuth, // Expose for signup page
   };
 
   return (

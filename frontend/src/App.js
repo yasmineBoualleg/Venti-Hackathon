@@ -8,6 +8,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import VantaBackground from "./components/layout/VantaBackground"; // Import background
 import StudentDashboard from "./pages/StudentDashboard";
 import LandingPage from "./pages/LandingPage";
 import ClubsListing from "./pages/ClubsListing";
@@ -15,6 +16,9 @@ import ClubDashboard from "./pages/ClubDashboard";
 import ClubEvents from "./pages/ClubEvents";
 import LoginPage from "./pages/LoginPage";
 import AuthCallbackPage from "./pages/AuthCallbackPage";
+import CompleteSignupPage from "./pages/CompleteSignupPage"; // Import new page
+import CreateClubPage from './pages/CreateClubPage';
+import ChatPage from './pages/ChatPage';
 
 function PrivateRoute({ children }) {
   const { isAuthenticated } = useAuth();
@@ -27,6 +31,7 @@ function AppRoutes() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
+      <Route path="/complete-signup" element={<CompleteSignupPage />} />
 
       <Route
         path="/dashboard"
@@ -41,6 +46,14 @@ function AppRoutes() {
         element={
           <PrivateRoute>
             <ClubsListing />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/clubs/create"
+        element={
+          <PrivateRoute>
+            <CreateClubPage />
           </PrivateRoute>
         }
       />
@@ -60,6 +73,14 @@ function AppRoutes() {
           </PrivateRoute>
         }
       />
+      <Route
+        path="/chat"
+        element={
+          <PrivateRoute>
+            <ChatPage />
+          </PrivateRoute>
+        }
+      />
 
       {/* Fallback route can go here */}
       <Route path="*" element={<Navigate to="/" />} />
@@ -71,6 +92,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <VantaBackground />
         <AppRoutes />
       </Router>
     </AuthProvider>

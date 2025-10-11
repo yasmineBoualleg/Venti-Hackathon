@@ -11,6 +11,77 @@ import LoadingSpinner from "../components/common/LoadingSpinner";
 import ErrorDisplay from "../components/common/ErrorDisplay";
 import "./ClubDashboard.css";
 
+// Members Tab Component
+const MembersTab = ({ members }) => (
+  <div className="members-list">
+    {members.map((member) => (
+      <div key={member.username} className="member-item card">
+        <div className="member-avatar">
+          {member.username.charAt(0).toUpperCase()}
+        </div>
+        <div className="member-details">
+          <span className="member-name">@{member.username}</span>
+          <span className="member-joined">
+            Joined:{" "}
+            {format(new Date(member.date_joined || new Date()), "MMM yyyy")}
+          </span>
+        </div>
+        {member.is_admin && <span className="admin-badge">Admin</span>}
+      </div>
+    ))}
+  </div>
+);
+
+// Join Requests Tab Component
+const RequestsTab = ({ clubId, refetchClub }) => {
+  const getRequests = useCallback(
+    () => apiClient.getClubJoinRequests(clubId),
+    [clubId]
+  );
+  const { data: requests, loading, error, refetch } = useApi(getRequests);
+
+  const handleRequest = async (requestId, action) => {
+    try {
+      await apiClient.handleJoinRequest(clubId, requestId, action);
+      refetch(); // Refetch requests
+      refetchClub(); // Refetch club details to update member count
+    } catch (err) {
+      alert(`Failed to ${action} request.`);
+    }
+  };
+
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorDisplay message="Could not load requests." />;
+
+  return (
+    <div className="requests-list">
+      {requests && requests.length > 0 ? (
+        requests.map((req) => (
+          <div key={req.id} className="request-item card">
+            <span>@{req.user.username}</span>
+            <div className="request-actions">
+              <button
+                className="btn btn-primary"
+                onClick={() => handleRequest(req.id, "approve")}
+              >
+                Approve
+              </button>
+              <button
+                className="btn"
+                onClick={() => handleRequest(req.id, "reject")}
+              >
+                Reject
+              </button>
+            </div>
+          </div>
+        ))
+      ) : (
+        <p>No pending join requests.</p>
+      )}
+    </div>
+  );
+};
+
 const ClubDashboard = () => {
   const { clubId } = useParams();
   const { user } = useAuth();
@@ -18,7 +89,7 @@ const ClubDashboard = () => {
   const [newMessage, setNewMessage] = useState("");
   const chatSocketRef = useRef(null);
   const chatMessagesRef = useRef(null);
-  const [activeTab, setActiveTab] = useState("info");
+  const [activeTab, setActiveTab] = useState("overview");
 
   const getClubDetails = useCallback(
     () => apiClient.getClubDetails(clubId),
@@ -42,12 +113,11 @@ const ClubDashboard = () => {
   } = useApi(getClubMessages);
 
   useEffect(() => {
-    if (initialMessages) {
-      setMessages(initialMessages);
-    }
+    if (initialMessages) setMessages(initialMessages);
   }, [initialMessages]);
 
   useEffect(() => {
+    // WebSocket connection logic remains the same...
     if (!club || !user || !club.chat_websocket_url) return;
 
     const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
@@ -55,12 +125,10 @@ const ClubDashboard = () => {
     const socketUrl = `${wsScheme}://${window.location.host}${club.chat_websocket_url}?token=${accessToken}`;
 
     chatSocketRef.current = new WebSocket(socketUrl);
-
     chatSocketRef.current.onmessage = (e) => {
       const data = JSON.parse(e.data);
       setMessages((prevMessages) => [...prevMessages, data]);
     };
-
     chatSocketRef.current.onclose = () => console.error("Chat socket closed");
     chatSocketRef.current.onerror = (err) =>
       console.error("Chat socket error:", err);
@@ -99,8 +167,9 @@ const ClubDashboard = () => {
   if (!club) return null;
 
   const isMember =
-    club.members.some((member) => member.username === user.username) ||
-    user.is_superuser;
+    user.is_superuser ||
+    club.members.some((member) => member.username === user.username);
+  const isAdmin = user.is_superuser || club.admin_username === user.username;
 
   return (
     <MainLayout>
@@ -122,8 +191,16 @@ const ClubDashboard = () => {
               className={`tab ${activeTab === "members" ? "active" : ""}`}
               onClick={() => setActiveTab("members")}
             >
-              Members
+              Members ({club.members_count})
             </button>
+            {isAdmin && (
+              <button
+                className={`tab ${activeTab === "requests" ? "active" : ""}`}
+                onClick={() => setActiveTab("requests")}
+              >
+                Requests
+              </button>
+            )}
           </div>
           <div className="tab-content">
             {activeTab === "info" && (
@@ -135,27 +212,11 @@ const ClubDashboard = () => {
                   <strong>Created:</strong>{" "}
                   {format(new Date(club.created_at), "PPP")}
                 </p>
-                <p>
-                  <strong>Total Members:</strong> {club.members_count}
-                </p>
               </div>
             )}
-            {activeTab === "members" && (
-              <div className="members-list">
-                {club.members.map((member) => (
-                  <div key={member.username} className="member-item">
-                    <div className="member-avatar">
-                      {member.username.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="member-details">
-                      <span className="member-name">@{member.username}</span>
-                      <span className="member-joined">
-                        Joined: {format(new Date(member.joined_at), "MMM yyyy")}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            {activeTab === "members" && <MembersTab members={club.members} />}
+            {activeTab === "requests" && isAdmin && (
+              <RequestsTab clubId={clubId} refetchClub={refetchClub} />
             )}
           </div>
         </div>
@@ -175,7 +236,7 @@ const ClubDashboard = () => {
                     key={msg.id || index}
                   >
                     <div className="message-author">@{msg.author_username}</div>
-                    <div className="message-text">{msg.text}</div>
+                    <div className="message-text">{msg.content}</div>
                     <div className="message-time">
                       {format(new Date(msg.created_at), "p")}
                     </div>

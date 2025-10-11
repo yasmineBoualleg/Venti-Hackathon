@@ -15,16 +15,67 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
 }
 
-.dashboard-section {
+.widgets-grid-main {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
   margin-top: var(--spacing-xxl);
 }
 
-.dashboard-section h3 {
+.widget {
+  padding: var(--spacing-md);
+}
+
+.widget.purple {
+  border-left: 3px solid var(--color-secondary);
+}
+.widget.teal {
+  border-left: 3px solid var(--color-primary);
+}
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
-  font-size: 20px;
+  font-size: 1rem;
   font-weight: 600;
+  color: var(--color-text-secondary);
+}
+.widget-header .material-icons {
+  font-size: 20px;
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+.task-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+}
+.task-item label {
+  flex: 1;
+}
+.task-item input:checked + label {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.session-promo {
+  color: var(--color-text-secondary);
+  line-height: 1.6;
 }
 
 .feed-column {
@@ -41,6 +92,7 @@
   font-weight: 600;
 }
 
+.events-list,
 .posts-list {
   display: flex;
   flex-direction: column;
@@ -59,6 +111,9 @@
 .empty-state .material-icons {
   font-size: 48px;
   opacity: 0.5;
+}
+.empty-state .btn {
+  margin-top: var(--spacing-sm);
 }
 
 /* Scrollbar styling */

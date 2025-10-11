@@ -1,0 +1,46 @@
+/* frontend/src/pages/CompleteSignupPage.css */
+.signup-page-container {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
+
+.signup-card {
+  width: min(90vw, 420px);
+  text-align: center;
+}
+
+.signup-card .venti-logo {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: var(--spacing-sm);
+}
+
+.signup-card h2 {
+  margin-bottom: var(--spacing-sm);
+}
+
+.signup-card .subtitle {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xl);
+}
+
+.signup-card form {
+  text-align: left;
+}
+
+.signup-card .btn {
+  width: 100%;
+  margin-top: var(--spacing-md);
+}
+
+.error-message {
+  color: var(--color-error);
+  background: rgba(255, 138, 138, 0.1);
+  border: 1px solid rgba(255, 138, 138, 0.3);
+  padding: 10px 12px;
+  border-radius: var(--border-radius-sm);
+  font-size: 14px;
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+}

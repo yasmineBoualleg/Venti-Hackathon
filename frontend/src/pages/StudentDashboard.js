@@ -3,6 +3,7 @@ import React from "react";
 import { useAuth } from "../contexts/AuthContext";
 import useApi from "../hooks/useApi";
 import { apiClient } from "../api/apiClient";
+import { Link } from "react-router-dom";
 
 import MainLayout from "../components/layout/MainLayout";
 import LoadingSpinner from "../components/common/LoadingSpinner";
@@ -11,6 +12,19 @@ import StatCard from "../components/dashboard/StatCard";
 import EventCard from "../components/dashboard/EventCard";
 import PostCard from "../components/dashboard/PostCard";
 import "./StudentDashboard.css";
+
+// A new sub-component for dashboard widgets
+const Widget = ({ color, icon, title, children }) => (
+  <div className={`widget card ${color || ""}`}>
+    {title && (
+      <div className="widget-header">
+        {icon && <span className="material-icons">{icon}</span>}
+        <h4>{title}</h4>
+      </div>
+    )}
+    <div className="widget-content">{children}</div>
+  </div>
+);
 
 const StudentDashboard = () => {
   const { user } = useAuth();
@@ -42,33 +56,57 @@ const StudentDashboard = () => {
             <h2>Dashboard</h2>
             <p className="subtitle">Welcome back, @{user.username}!</p>
           </div>
+
           <div className="stats-grid">
             <StatCard
               label="My Clubs"
               value={dashboardData.clubs_count}
               icon="group"
+              linkTo="/clubs"
             />
             <StatCard label="XP Points" value={user.xp_points} icon="star" />
           </div>
-          <section className="dashboard-section">
-            <h3>Upcoming Events</h3>
-            <div className="events-list">
-              {dashboardData.upcoming_events.length > 0 ? (
-                dashboardData.upcoming_events.map((event) => (
-                  <EventCard key={event.id} event={event} />
-                ))
-              ) : (
-                <div className="empty-state card">
-                  <span className="material-icons">event_busy</span>
-                  <p>No upcoming events from your clubs.</p>
+
+          <div className="widgets-grid-main">
+            <Widget color="purple" title="My Tasks">
+              <div className="task-list">
+                <div className="task-item">
+                  <input type="checkbox" id="task1" defaultChecked />
+                  <label htmlFor="task1">Review Linear Algebra Notes</label>
                 </div>
-              )}
-            </div>
-          </section>
+                <div className="task-item">
+                  <input type="checkbox" id="task2" />
+                  <label htmlFor="task2">Complete PyTorch tutorial</label>
+                </div>
+              </div>
+            </Widget>
+            <Widget color="teal" title="Session Focus">
+              <p className="session-promo">
+                Stay focused and track your study sessions. Coming soon!
+              </p>
+            </Widget>
+          </div>
         </div>
 
         <aside className="feed-column">
-          <h3>Recent Activity</h3>
+          <h3>Upcoming Events</h3>
+          <div className="events-list">
+            {dashboardData.upcoming_events.length > 0 ? (
+              dashboardData.upcoming_events.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))
+            ) : (
+              <div className="empty-state card">
+                <span className="material-icons">event_busy</span>
+                <p>No upcoming events.</p>
+                <Link to="/events" className="btn">
+                  Browse Events
+                </Link>
+              </div>
+            )}
+          </div>
+
+          <h3 style={{ marginTop: "var(--spacing-xl)" }}>Recent Activity</h3>
           <div className="posts-list">
             {dashboardData.recent_posts.length > 0 ? (
               dashboardData.recent_posts.map((post) => (
@@ -77,7 +115,7 @@ const StudentDashboard = () => {
             ) : (
               <div className="empty-state card">
                 <span className="material-icons">chat_bubble_outline</span>
-                <p>No recent activity in your clubs.</p>
+                <p>No recent activity.</p>
               </div>
             )}
           </div>
