@@ -1,39 +1,41 @@
 /* frontend/src/components/dashboard/EventCard.css */
-.event-card {
-  display: grid;
-  grid-template-columns: 80px 1fr;
-  gap: var(--spacing-lg);
-  align-items: center;
-  margin-bottom: var(--spacing-md);
+.event-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
 }
 
-.event-card.detailed {
-  grid-template-columns: 80px 1fr auto;
+.event-card-header {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
 }
 
 .event-date {
   text-align: center;
   background: var(--gradient-primary);
   border-radius: var(--border-radius-sm);
-  padding: var(--spacing-md) var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
   color: white;
   font-weight: 700;
-}
-
-.date-day {
-  font-size: 28px;
-  line-height: 1;
+  flex-shrink: 0;
 }
 
 .date-month {
   font-size: 14px;
   text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.date-day {
+  font-size: 28px;
+  line-height: 1.1;
 }
 
 .event-title {
   font-size: 18px;
   font-weight: 600;
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
 }
 
 .event-club,
@@ -45,15 +47,35 @@
   font-size: 14px;
 }
 
+.event-club .material-icons,
+.event-time .material-icons {
+  font-size: 16px;
+}
+
 .event-description {
   color: var(--color-text-secondary);
   font-size: 14px;
-  margin-top: var(--spacing-md);
-  line-height: 1.5;
+  line-height: 1.6;
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--color-border);
+}
+
+.event-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto; /* Pushes footer to the bottom */
 }
 
 .event-actions {
   display: flex;
-  flex-direction: column;
   gap: var(--spacing-sm);
+}
+
+.event-actions .action-btn {
+  height: 38px;
+  padding: 0 var(--spacing-sm);
+}
+.event-actions .action-btn .material-icons {
+  font-size: 18px;
 }

@@ -1,0 +1,74 @@
+/* frontend/src/pages/CalendarPage.css */
+
+.calendar-container {
+  padding: var(--spacing-lg);
+}
+
+/* General Calendar styling */
+.rbc-calendar {
+  color: var(--color-text-primary);
+}
+
+/* Toolbar (header with navigation) */
+.rbc-toolbar {
+  margin-bottom: var(--spacing-lg);
+}
+.rbc-toolbar .rbc-btn-group button {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+}
+.rbc-toolbar .rbc-btn-group button:hover,
+.rbc-toolbar .rbc-btn-group button.rbc-active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+.rbc-toolbar-label {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Month/Week/Day headers */
+.rbc-header {
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--spacing-sm);
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Calendar grid */
+.rbc-month-view,
+.rbc-time-view {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+}
+.rbc-day-bg {
+  border-left: 1px solid var(--color-border);
+}
+.rbc-day-bg:first-child {
+  border-left: none;
+}
+.rbc-month-row {
+  border-top: 1px solid var(--color-border);
+}
+
+/* Today's date highlight */
+.rbc-today {
+  background-color: rgba(0, 212, 170, 0.1);
+}
+
+/* Event items */
+.rbc-event,
+.rbc-day-slot .rbc-event {
+  background-color: var(--color-secondary);
+  border: 1px solid var(--color-secondary);
+  border-radius: var(--border-radius-sm);
+  color: white;
+  padding: 4px 8px;
+}
+
+.rbc-event.rbc-selected {
+  background-color: var(--color-primary);
+}

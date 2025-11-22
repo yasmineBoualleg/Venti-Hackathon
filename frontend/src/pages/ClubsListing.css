@@ -84,6 +84,34 @@
   width: 100%;
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  padding: 0 var(--spacing-sm);
+}
+
+.search-bar .material-icons {
+  color: var(--color-text-secondary);
+}
+
+.search-bar input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--color-text-primary);
+  padding: 10px;
+  font-size: 14px;
+}
+
 /* Modal styles */
 .modal {
   position: fixed;

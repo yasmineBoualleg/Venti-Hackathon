@@ -26,8 +26,8 @@ const LandingPage = () => {
 
       <main className="hero-section">
         <h1>
-          <span className="ven-solid">ven</span>
-          <span className="ti-stroke">ti</span>
+          <span className="ven-solid">VEN</span>
+          <span className="ti-stroke">TI</span>
         </h1>
         <p>
           ONE PLACE <span className="highlight">for</span> clubs, study, and

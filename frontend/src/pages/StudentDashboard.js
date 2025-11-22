@@ -1,5 +1,5 @@
 // frontend/src/pages/StudentDashboard.js
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import useApi from "../hooks/useApi";
 import { apiClient } from "../api/apiClient";
@@ -26,6 +26,69 @@ const Widget = ({ color, icon, title, children }) => (
   </div>
 );
 
+const TasksWidget = () => {
+  const [tasks, setTasks] = useState([
+    { id: 1, text: "Review Linear Algebra Notes", completed: true },
+    { id: 2, text: "Complete PyTorch tutorial", completed: false },
+  ]);
+  const [newTask, setNewTask] = useState("");
+
+  const handleAddTask = (e) => {
+    e.preventDefault();
+    if (newTask.trim() === "") return;
+    const task = { id: Date.now(), text: newTask, completed: false };
+    setTasks([...tasks, task]);
+    setNewTask("");
+  };
+
+  const handleToggleTask = (taskId) => {
+    setTasks(
+      tasks.map((task) =>
+        task.id === taskId ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
+  const handleDeleteTask = (taskId) => {
+    setTasks(tasks.filter((task) => task.id !== taskId));
+  };
+
+  return (
+    <Widget color="purple" title="My Tasks" icon="check_circle">
+      <div className="task-list">
+        {tasks.map((task) => (
+          <div className="task-item" key={task.id}>
+            <input
+              type="checkbox"
+              id={`task-${task.id}`}
+              checked={task.completed}
+              onChange={() => handleToggleTask(task.id)}
+            />
+            <label htmlFor={`task-${task.id}`}>{task.text}</label>
+            <button
+              className="delete-task-btn"
+              onClick={() => handleDeleteTask(task.id)}
+            >
+              <span className="material-icons">delete_outline</span>
+            </button>
+          </div>
+        ))}
+      </div>
+      <form onSubmit={handleAddTask} className="add-task-form">
+        <input
+          type="text"
+          value={newTask}
+          onChange={(e) => setNewTask(e.target.value)}
+          placeholder="Add a new task..."
+        />
+        <button type="submit" className="btn btn-primary">
+          Add
+        </button>
+      </form>
+    </Widget>
+  );
+};
+
 const StudentDashboard = () => {
   const { user } = useAuth();
   const getDashboardData = React.useCallback(
@@ -48,8 +111,8 @@ const StudentDashboard = () => {
     );
   if (!dashboardData) return null;
 
-  const noActivity = 
-    dashboardData.upcoming_events.length === 0 && 
+  const noActivity =
+    dashboardData.upcoming_events.length === 0 &&
     dashboardData.recent_posts.length === 0;
 
   return (
@@ -83,19 +146,8 @@ const StudentDashboard = () => {
           )}
 
           <div className="widgets-grid-main">
-            <Widget color="purple" title="My Tasks">
-              <div className="task-list">
-                <div className="task-item">
-                  <input type="checkbox" id="task1" defaultChecked />
-                  <label htmlFor="task1">Review Linear Algebra Notes</label>
-                </div>
-                <div className="task-item">
-                  <input type="checkbox" id="task2" />
-                  <label htmlFor="task2">Complete PyTorch tutorial</label>
-                </div>
-              </div>
-            </Widget>
-            <Widget color="teal" title="Session Focus">
+            <TasksWidget />
+            <Widget color="teal" title="Session Focus" icon="timer">
               <p className="session-promo">
                 Stay focused and track your study sessions. Coming soon!
               </p>

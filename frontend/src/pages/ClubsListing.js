@@ -60,17 +60,17 @@ const ClubCard = ({ club, onJoinClub, onGoToClub, onManageClub }) => {
             onClick={() => onJoinClub(club.id)}
           >
             <span className="material-icons">person_add</span>
-            {club.requires_request ? 'Request to Join' : 'Join Club'}
+            {club.requires_request ? "Request to Join" : "Join Club"}
           </button>
         )}
         {club.is_admin && (
-            <button
-                className="action-btn btn-tertiary"
-                onClick={() => onManageClub(club.id)}
-            >
-                <span className="material-icons">settings</span>
-                Manage
-            </button>
+          <button
+            className="action-btn btn-tertiary"
+            onClick={() => onManageClub(club.id)}
+          >
+            <span className="material-icons">settings</span>
+            Manage
+          </button>
         )}
       </div>
     </div>
@@ -162,6 +162,7 @@ const CreateClubModal = ({ isOpen, onClose, onCreateSuccess }) => {
 const ClubsListing = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const getClubs = useCallback(() => apiClient.getClubs(), []);
   const { data: clubs, loading, error, refetch } = useApi(getClubs);
@@ -207,6 +208,12 @@ const ClubsListing = () => {
     );
   }
 
+  const filteredClubs = (clubs || []).filter(
+    (club) =>
+      club.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      club.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <MainLayout>
       <div className="main-content">
@@ -220,6 +227,15 @@ const ClubsListing = () => {
             </p>
           </div>
           <div className="header-right">
+            <div className="search-bar">
+              <span className="material-icons">search</span>
+              <input
+                type="text"
+                placeholder="Search clubs..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
             <button
               className="create-club-btn btn btn-primary"
               onClick={() => setIsModalOpen(true)}
@@ -231,8 +247,8 @@ const ClubsListing = () => {
         </div>
 
         <div className="clubs-grid">
-          {(clubs || []).length > 0 ? (
-            (clubs || []).map((club) => (
+          {filteredClubs.length > 0 ? (
+            filteredClubs.map((club) => (
               <ClubCard
                 key={club.id}
                 club={club}
@@ -244,8 +260,8 @@ const ClubsListing = () => {
           ) : (
             <div className="empty-state card">
               <span className="material-icons">search_off</span>
-              <h3>No clubs available</h3>
-              <p>Be the first to create one!</p>
+              <h3>No clubs found</h3>
+              <p>Try a different search or be the first to create one!</p>
             </div>
           )}
         </div>

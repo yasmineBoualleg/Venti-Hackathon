@@ -1,0 +1,6 @@
+/* frontend/src/pages/ClubEvents.css */
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: var(--spacing-lg);
+}

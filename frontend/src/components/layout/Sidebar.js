@@ -67,6 +67,10 @@ const Sidebar = () => {
           <span className="material-icons">event</span>
           <span className="nav-text">Events</span>
         </NavLink>
+        <NavLink to="/calendar" className="nav-item">
+          <span className="material-icons">calendar_today</span>
+          <span className="nav-text">Calendar</span>
+        </NavLink>
       </nav>
 
       <div className="sidebar-footer">

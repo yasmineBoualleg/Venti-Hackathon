@@ -125,7 +125,7 @@
 
 .message-item {
   padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--border-radius-sm);
+  border-radius: 12px;
   background: var(--color-surface);
   max-width: 80%;
   align-self: flex-start;
@@ -169,6 +169,10 @@
   background: rgba(255, 255, 255, 0.05);
   color: var(--color-text-primary);
   padding: 0 12px;
+  outline: none;
+}
+.chat-input-area input:focus {
+  border-color: var(--color-primary);
 }
 .chat-input-area .btn .material-icons {
   margin: 0;

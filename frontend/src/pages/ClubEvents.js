@@ -194,7 +194,7 @@ const ClubEvents = () => {
             </button>
           </div>
         </div>
-        <div className="events-container">
+        <div className="events-grid">
           {(events || []).length > 0 ? (
             (events || []).map((event) => (
               <EventCard

@@ -17,8 +17,9 @@ import ClubEvents from "./pages/ClubEvents";
 import LoginPage from "./pages/LoginPage";
 import AuthCallbackPage from "./pages/AuthCallbackPage";
 import CompleteSignupPage from "./pages/CompleteSignupPage"; // Import new page
-import CreateClubPage from './pages/CreateClubPage';
-import ChatPage from './pages/ChatPage';
+import CreateClubPage from "./pages/CreateClubPage";
+import ChatPage from "./pages/ChatPage";
+import CalendarPage from "./pages/CalendarPage"; // Import new Calendar page
 
 function PrivateRoute({ children }) {
   const { isAuthenticated } = useAuth();
@@ -70,6 +71,14 @@ function AppRoutes() {
         element={
           <PrivateRoute>
             <ClubEvents />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/calendar"
+        element={
+          <PrivateRoute>
+            <CalendarPage />
           </PrivateRoute>
         }
       />
