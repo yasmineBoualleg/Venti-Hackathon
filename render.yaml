@@ -37,10 +37,15 @@ services:
         source: "/*"
         destination: "/index.html"
 
+  # Redis (Cache/Channels)
+  - type: redis
+    name: venti-redis
+    region: oregon
+    plan: free # Attempt to use free tier if available
+    ipAllowList: [] # Allow internal connections
+
 databases:
   - name: venti-db
     databaseName: venti
     user: venti_user
-
-  - name: venti-redis
-    type: redis
+    plan: free # Attempt to use free tier
