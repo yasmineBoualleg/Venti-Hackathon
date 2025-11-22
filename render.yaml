@@ -27,7 +27,7 @@ services:
           property: connectionString
 
   # Frontend (React/Vite)
-  # Frontend (React/Vite)
+
   - type: web
     name: venti-frontend
     env: static
