@@ -28,7 +28,6 @@ services:
   # Frontend (React/Vite)
   - type: static
     name: venti-frontend
-    env: node
     rootDir: frontend
     buildCommand: "npm install && npm run build"
     staticPublishPath: "./build"
