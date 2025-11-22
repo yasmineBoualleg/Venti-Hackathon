@@ -3,6 +3,7 @@ services:
   - type: web
     name: venti-backend
     env: python
+    plan: free
     rootDir: backend
     buildCommand: "./build.sh"
     startCommand: "daphne -b 0.0.0.0 -p $PORT core.asgi:application"
@@ -30,6 +31,7 @@ services:
   - type: web
     name: venti-frontend
     env: static
+    plan: free
     rootDir: frontend
     buildCommand: "npm install && npm run build"
     staticPublishPath: "./build"
