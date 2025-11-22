@@ -38,10 +38,7 @@ services:
     staticPublishPath: "./build"
     envVars:
       - key: REACT_APP_API_URL
-        fromService:
-          type: web
-          name: venti-backend
-          envVarKey: RENDER_EXTERNAL_URL
+        value: https://venti-backend-t37d.onrender.com
     routes:
       - type: rewrite
         source: "/*"
