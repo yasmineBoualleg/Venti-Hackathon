@@ -25,6 +25,8 @@ services:
           type: redis
           name: venti-redis
           property: connectionString
+      - key: FRONTEND_URL
+        value: "https://venti-frontend.onrender.com"
 
   # Frontend (React/Vite)
 
@@ -34,6 +36,12 @@ services:
     rootDir: frontend
     buildCommand: "npm install && npm run build"
     staticPublishPath: "./build"
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          type: web
+          name: venti-backend
+          envVarKey: RENDER_EXTERNAL_URL
     routes:
       - type: rewrite
         source: "/*"

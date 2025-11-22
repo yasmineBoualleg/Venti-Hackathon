@@ -11,8 +11,10 @@ class FrontendAppView(TemplateView):
             'user': self.request.user,
         }
 
+from django.conf import settings
+
 @login_required
 def social_auth_callback_view(request):
     refresh = RefreshToken.for_user(request.user)
     access = refresh.access_token
-    return redirect(f'http://localhost:3000/auth/callback?access_token={str(access)}&refresh_token={str(refresh)}')
+    return redirect(f'{settings.FRONTEND_URL}/auth/callback?access_token={str(access)}&refresh_token={str(refresh)}')

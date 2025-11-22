@@ -123,9 +123,12 @@ SIMPLE_JWT = {
 }
 
 # --- CORS Settings ---
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    FRONTEND_URL,
 ]
 if os.getenv('RENDER_EXTERNAL_HOSTNAME'):
     CORS_ALLOWED_ORIGINS.append(f"https://{os.getenv('RENDER_EXTERNAL_HOSTNAME')}")
@@ -153,7 +156,7 @@ SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_LOGIN_METHODS = ('email',)
 LOGIN_REDIRECT_URL = '/social-auth-callback/'
-ACCOUNT_LOGOUT_REDIRECT_URL = 'http://localhost:3000/'
+ACCOUNT_LOGOUT_REDIRECT_URL = FRONTEND_URL
 
 # --- Channels (WebSocket) Settings ---
 ASGI_APPLICATION = "core.asgi.application"
