@@ -3,9 +3,7 @@ import React from "react";
 import "./LandingPage.css";
 
 const LandingPage = () => {
-  const baseUrl = process.env.REACT_APP_API_URL
-    ? process.env.REACT_APP_API_URL.replace("/api", "")
-    : "http://127.0.0.1:8000";
+  const baseUrl = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
   const googleLoginUrl = `${baseUrl}/accounts/google/login/`;
 
   return (
