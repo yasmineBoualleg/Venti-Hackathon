@@ -52,10 +52,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 
+FRONTEND_BUILD_DIR = os.path.join(BASE_DIR, '..', 'frontend', 'build')
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, '..', 'frontend', 'build')],
+        'DIRS': [FRONTEND_BUILD_DIR] if os.path.exists(FRONTEND_BUILD_DIR) else [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -68,10 +70,11 @@ TEMPLATES = [
     },
 ]
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, '..', 'frontend', 'build', 'static'),
-    os.path.join(BASE_DIR, '..', 'frontend', 'build'),
-]
+STATICFILES_DIRS = []
+if os.path.exists(os.path.join(FRONTEND_BUILD_DIR, 'static')):
+    STATICFILES_DIRS.append(os.path.join(FRONTEND_BUILD_DIR, 'static'))
+if os.path.exists(FRONTEND_BUILD_DIR):
+    STATICFILES_DIRS.append(FRONTEND_BUILD_DIR)
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
